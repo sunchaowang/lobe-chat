@@ -2,7 +2,7 @@ import { ActionIcon, Avatar, Icon } from '@lobehub/ui';
 import { Dropdown } from 'antd';
 import { createStyles } from 'antd-style';
 import isEqual from 'fast-deep-equal';
-import { ArrowRight, Blocks, Store, ToyBrick } from 'lucide-react';
+import { ArrowRight, Blocks, PaletteIcon, Store, ToyBrick } from 'lucide-react';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
@@ -42,18 +42,18 @@ const Tools = memo(() => {
         menu={{
           className: styles.menu,
           items: [
-            // {
-            //   children: [
-            //     {
-            //       icon: <Icon icon={PaletteIcon} size={{ fontSize: 16 }} style={{ padding: 4 }} />,
-            //       key: 'dalle3',
-            //       label: <ToolItem identifier={'dalle3'} label={'DALL·E 3'} />,
-            //     },
-            //   ],
-            //   key: 'builtins',
-            //   label: t('tools.builtins.groupName'),
-            //   type: 'group',
-            // },
+            {
+              children: [
+                {
+                  icon: <Icon icon={PaletteIcon} size={{ fontSize: 16 }} style={{ padding: 4 }} />,
+                  key: 'dalle3',
+                  label: <ToolItem identifier={'dalle3'} label={'DALL·E 3'} />,
+                },
+              ],
+              key: 'builtins',
+              label: t('tools.builtins.groupName'),
+              type: 'group',
+            },
             {
               children: [
                 ...list.map((item) => ({
