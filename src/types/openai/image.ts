@@ -1,5 +1,6 @@
+export type ImageGenerationSize = '256x256' | '512x512' | '1024x1024';
 export interface OpenAIImagePayload {
-  model: 'dalle-2' | 'dalle-3';
+  model: 'dall-e-2' | 'dall-e-3';
   /**
    * The number of images to generate. Must be between 1 and 10.
    */
@@ -13,5 +14,5 @@ export interface OpenAIImagePayload {
    * The size of the generated images.
    * Must be one of `256x256`, `512x512`, or `1024x1024`.
    */
-  size?: '256x256' | '512x512' | '1024x1024';
+  size?: ImageGenerationSize;
 }

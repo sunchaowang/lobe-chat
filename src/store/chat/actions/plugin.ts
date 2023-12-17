@@ -17,6 +17,7 @@ const n = setNamespace('plugin');
 
 export interface ChatPluginAction {
   fillPluginMessageContent: (id: string, content: string) => Promise<void>;
+  invokeBuiltinTool: (id: string, params: string) => Promise<void>;
   runPluginDefaultType: (id: string, payload: any) => Promise<void>;
   triggerFunctionCall: (id: string) => Promise<void>;
   updatePluginState: (id: string, key: string, value: any) => Promise<void>;
@@ -36,6 +37,12 @@ export const chatPlugin: StateCreator<
 
     const chats = chatSelectors.currentChats(get());
     await coreProcessMessage(chats, id);
+  },
+  invokeBuiltinTool: async (key, args) => {
+    const params = JSON.parse(args);
+    console.log(key, params);
+    const x = await useToolStore.getState().invokeBuiltinTool(key, params);
+    console.log(x);
   },
   runPluginDefaultType: async (id, payload) => {
     const { refreshMessages, coreProcessMessage, toggleChatLoading } = get();
@@ -111,9 +118,19 @@ export const chatPlugin: StateCreator<
     });
     await refreshMessages();
 
-    if (payload.type === 'standalone') {
-      // TODO: need to auth user's settings
-    } else runPluginDefaultType(id, payload);
+    switch (payload.type) {
+      case 'standalone': {
+        // TODO: need to auth user's settings
+        break;
+      }
+      case 'builtin': {
+        await get().invokeBuiltinTool(payload.apiName, payload.arguments);
+        break;
+      }
+      default: {
+        await runPluginDefaultType(id, payload);
+      }
+    }
   },
   updatePluginState: async (id, key, value) => {
     const { refreshMessages } = get();

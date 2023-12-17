@@ -3,6 +3,7 @@ import { uniq, uniqBy } from 'lodash-es';
 import { Md5 } from 'ts-md5';
 
 import { PLUGIN_SCHEMA_API_MD5_PREFIX, PLUGIN_SCHEMA_SEPARATOR } from '@/const/plugin';
+import { builtinTools } from '@/tools';
 import { ChatCompletionFunctions } from '@/types/openai/chat';
 import { InstallPluginMeta, LobeToolCustomPlugin } from '@/types/tool/plugin';
 
@@ -90,6 +91,7 @@ const enabledSchema =
         // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
         enabledPlugins.includes(m?.identifier),
       )
+      .concat(builtinTools.map((b) => b.manifest))
       .flatMap((manifest) =>
         manifest.api.map((m) => {
           const pluginType =
@@ -122,16 +124,19 @@ const enabledSchema =
 const enabledPluginsSystemRoles =
   (enabledPlugins: string[] = []) =>
   (s: ToolStoreState) => {
-    const toolsSystemRole = enabledPlugins
-      .map((id) => {
-        const manifest = getPluginManifestById(id)(s);
+    const toolsSystemRole = installedPluginManifestList(s)
+      // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
+      .filter((m) => enabledPlugins.includes(m?.identifier))
+      .concat(builtinTools.map((b) => b.manifest))
+      .map((manifest) => {
         if (!manifest) return '';
-        const meta = getPluginMetaById(id)(s);
 
-        const title = pluginHelpers.getPluginTitle(meta);
-        const desc = pluginHelpers.getPluginDesc(meta);
+        const meta = manifest.meta || {};
 
-        return [`### ${title}`, manifest.systemRole || desc].join('\n\n');
+        const title = pluginHelpers.getPluginTitle(meta) || manifest.identifier;
+        const systemRole = manifest.systemRole || pluginHelpers.getPluginDesc(meta);
+
+        return [`### ${title}`, systemRole].join('\n\n');
       })
       .filter(Boolean);
 

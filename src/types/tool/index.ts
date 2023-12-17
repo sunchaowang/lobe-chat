@@ -10,3 +10,5 @@ export interface LobeTool {
   settings?: any;
   type: LobeToolType;
 }
+
+export * from './builtin';

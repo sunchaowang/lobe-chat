@@ -13,5 +13,6 @@ export const createImageGeneration = async ({
 
   const urls = res.data.map((o) => o.url) as string[];
 
+  console.log(urls);
   return new Response(JSON.stringify(urls));
 };
