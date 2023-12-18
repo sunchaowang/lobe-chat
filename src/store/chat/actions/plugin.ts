@@ -17,8 +17,8 @@ const n = setNamespace('plugin');
 
 export interface ChatPluginAction {
   fillPluginMessageContent: (id: string, content: string) => Promise<void>;
-  invokeBuiltinTool: (id: string, params: string) => Promise<void>;
-  runPluginDefaultType: (id: string, payload: any) => Promise<void>;
+  invokeBuiltinTool: (id: string, payload: ChatPluginPayload) => Promise<void>;
+  invokeDefaultTypePlugin: (id: string, payload: any) => Promise<void>;
   triggerFunctionCall: (id: string) => Promise<void>;
   updatePluginState: (id: string, key: string, value: any) => Promise<void>;
 }
@@ -38,13 +38,19 @@ export const chatPlugin: StateCreator<
     const chats = chatSelectors.currentChats(get());
     await coreProcessMessage(chats, id);
   },
-  invokeBuiltinTool: async (key, args) => {
-    const params = JSON.parse(args);
-    console.log(key, params);
-    const x = await useToolStore.getState().invokeBuiltinTool(key, params);
-    console.log(x);
+  invokeBuiltinTool: async (id, payload) => {
+    const { toggleChatLoading, refreshMessages } = get();
+    const params = JSON.parse(payload.arguments);
+    toggleChatLoading(true, id, n('invokeBuiltinTool') as string);
+    const data = await useToolStore.getState().invokeBuiltinTool(payload.apiName, params);
+    toggleChatLoading(false);
+
+    if (data) {
+      await messageService.updateMessageContent(id, data);
+      await refreshMessages();
+    }
   },
-  runPluginDefaultType: async (id, payload) => {
+  invokeDefaultTypePlugin: async (id, payload) => {
     const { refreshMessages, coreProcessMessage, toggleChatLoading } = get();
     let data: string;
 
@@ -73,7 +79,7 @@ export const chatPlugin: StateCreator<
     await coreProcessMessage(chats, id);
   },
   triggerFunctionCall: async (id) => {
-    const { runPluginDefaultType, refreshMessages } = get();
+    const { invokeDefaultTypePlugin, invokeBuiltinTool, refreshMessages } = get();
 
     const message = chatSelectors.getMessageById(id)(get());
     if (!message) return;
@@ -124,11 +130,11 @@ export const chatPlugin: StateCreator<
         break;
       }
       case 'builtin': {
-        await get().invokeBuiltinTool(payload.apiName, payload.arguments);
+        await invokeBuiltinTool(id, payload);
         break;
       }
       default: {
-        await runPluginDefaultType(id, payload);
+        await invokeDefaultTypePlugin(id, payload);
       }
     }
   },

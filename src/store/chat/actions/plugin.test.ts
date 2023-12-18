@@ -191,7 +191,7 @@ describe('ChatPluginAction', () => {
 
       useToolStore.setState({ installedPlugins: [plugin] });
 
-      useChatStore.setState({ refreshMessages: vi.fn(), runPluginDefaultType: vi.fn() });
+      useChatStore.setState({ refreshMessages: vi.fn(), invokeDefaultTypePlugin: vi.fn() });
 
       (chatSelectors.getMessageById as Mock).mockImplementation(() => () => ({
         id: messageId,
@@ -231,7 +231,7 @@ describe('ChatPluginAction', () => {
 
       useChatStore.setState({
         refreshMessages: vi.fn(),
-        runPluginDefaultType: vi.fn(),
+        invokeDefaultTypePlugin: vi.fn(),
       });
 
       (chatSelectors.getMessageById as Mock).mockImplementation(() => () => ({

@@ -17,6 +17,13 @@ export const DalleManifest: BuiltinToolManifest = {
             minItems: 1,
             type: 'array',
           },
+          quality: {
+            default: 'standard',
+            description:
+              'The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image.',
+            enum: ['standard', 'hd'],
+            type: 'string',
+          },
           seeds: {
             description:
               'A list of seeds to use for each prompt. If the user asks to modify a previous image, populate this field with the seed used to generate that image from the image dalle metadata.',
@@ -30,6 +37,13 @@ export const DalleManifest: BuiltinToolManifest = {
             description:
               'The resolution of the requested image, which can be wide, square, or tall. Use 1024x1024 (square) as the default unless the prompt suggests a wide image, 1792x1024, or a full-body portrait, in which case 1024x1792 (tall) should be used instead. Always include this parameter in the request.',
             enum: ['1792x1024', '1024x1024', '1024x1792'],
+            type: 'string',
+          },
+          style: {
+            default: 'vivid',
+            description:
+              'The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images.',
+            enum: ['vivid', 'natural'],
             type: 'string',
           },
         },
@@ -71,8 +85,8 @@ type text2image = (params: {
   size?: '1792x1024' | '1024x1024' | '1024x1792';
   // The user's original image description, potentially modified to abide by the dalle policies. If the user does not suggest a number of captions to create, create four of them. If creating multiple captions, make them as diverse as possible. If the user requested modifications to previous images, the captions should not simply be longer, but rather it should be refactored to integrate the suggestions into each of the captions. Generate no more than 4 images, even if the user requests more.
   prompts: string[];
-  // A list of seeds to use for each prompt. If the user asks to modify a previous image, populate this field with the seed used to generate that image from the image dalle metadata.
-  seeds?: number[];
+  style?: 'vivid' | 'natural';
+  quality?: 'standard' | 'hd';
 }) => any;
 \`\`\`
 `,
