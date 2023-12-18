@@ -1,4 +1,4 @@
-import { DalleManifest } from '@/tools/dalle';
+import { DalleManifest } from '@/store/tool/slices/builtin/tools/dalle';
 import { LobeBuiltinTool } from '@/types/tool';
 
 export const builtinTools: LobeBuiltinTool[] = [
