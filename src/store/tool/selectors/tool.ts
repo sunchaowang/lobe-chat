@@ -9,18 +9,13 @@ import { pluginSelectors } from '@/store/tool/slices/plugin/selectors';
 import { ChatCompletionFunctions } from '@/types/openai/chat';
 
 const enabledSchema =
-  (enabledPlugins: string[] = []) =>
+  (tools: string[] = []) =>
   (s: ToolStoreState): ChatCompletionFunctions[] => {
-    // 如果不存在 enabledPlugins，那么全部不启用
-    if (!enabledPlugins) return [];
-
     const list = pluginSelectors
       .installedPluginManifestList(s)
-      .filter((m) =>
-        // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
-        enabledPlugins.includes(m?.identifier),
-      )
       .concat(s.builtinTools.map((b) => b.manifest as LobeChatPluginManifest))
+      // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
+      .filter((m) => tools.includes(m?.identifier))
       .flatMap((manifest) =>
         manifest.api.map((m) => {
           const pluginType =
@@ -51,13 +46,13 @@ const enabledSchema =
   };
 
 const enabledSystemRoles =
-  (enabledPlugins: string[] = []) =>
+  (tools: string[] = []) =>
   (s: ToolStoreState) => {
     const toolsSystemRole = pluginSelectors
       .installedPluginManifestList(s)
-      // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
-      .filter((m) => enabledPlugins.includes(m?.identifier))
       .concat(s.builtinTools.map((b) => b.manifest as LobeChatPluginManifest))
+      // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
+      .filter((m) => tools.includes(m?.identifier))
       .map((manifest) => {
         if (!manifest) return '';
 

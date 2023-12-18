@@ -38,7 +38,7 @@ export const DalleManifest: BuiltinToolManifest = {
       },
     },
   ],
-  identifier: 'dalle',
+  identifier: 'dalle3',
   meta: {
     avatar: '🖍',
     title: 'Dall·E 3',
