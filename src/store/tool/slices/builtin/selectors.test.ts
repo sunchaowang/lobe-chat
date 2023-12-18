@@ -2,7 +2,7 @@ import { LobeChatPluginManifest, LobeChatPluginMeta } from '@lobehub/chat-plugin
 import { describe, expect, it } from 'vitest';
 
 import { ToolStoreState, initialState } from '../../initialState';
-import { customPluginSelectors } from './selectors';
+import { builtinToolSelectors } from './selectors';
 
 const mockState = {
   ...initialState,
@@ -51,7 +51,7 @@ const mockState = {
 describe('pluginSelectors', () => {
   describe('isCustomPlugin', () => {
     it('should return false for a non-custom plugin', () => {
-      const result = customPluginSelectors.isCustomPlugin('plugin-1')(mockState);
+      const result = builtinToolSelectors.isBuiltinTool('plugin-1')(mockState);
       expect(result).toBe(false);
     });
 
@@ -63,7 +63,7 @@ describe('pluginSelectors', () => {
           { identifier: 'custom-plugin', type: 'customPlugin' },
         ],
       } as ToolStoreState;
-      const result = customPluginSelectors.isCustomPlugin('custom-plugin')(stateWithCustomPlugin);
+      const result = builtinToolSelectors.isBuiltinTool('custom-plugin')(stateWithCustomPlugin);
       expect(result).toBe(true);
     });
   });
