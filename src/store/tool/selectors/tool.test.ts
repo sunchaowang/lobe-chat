@@ -108,4 +108,21 @@ describe('toolSelectors', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('getPluginManifestLoadingStatus', () => {
+    it('should return "loading" if the plugin manifest is being loaded', () => {
+      const result = toolSelectors.getManifestLoadingStatus('plugin-2')(mockState);
+      expect(result).toBe('loading');
+    });
+
+    it('should return "error" if the plugin manifest is not found', () => {
+      const result = toolSelectors.getManifestLoadingStatus('non-existing-plugin')(mockState);
+      expect(result).toBe('error');
+    });
+
+    it('should return "success" if the plugin manifest is loaded', () => {
+      const result = toolSelectors.getManifestLoadingStatus('plugin-1')(mockState);
+      expect(result).toBe('success');
+    });
+  });
 });

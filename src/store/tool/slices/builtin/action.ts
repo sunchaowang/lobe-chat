@@ -1,6 +1,7 @@
 import pMap from 'p-map';
 import { StateCreator } from 'zustand/vanilla';
 
+import { fileService } from '@/services/file';
 import { imageGenerationService } from '@/services/imageGeneration';
 import { OpenAIImagePayload } from '@/types/openai/image';
 import { setNamespace } from '@/utils/storeDebug';
@@ -50,15 +51,19 @@ export const createBuiltinToolSlice: StateCreator<
     const data = await pMap(prompts, async (prompt) => {
       const urls = await imageGenerationService.generateImage({ prompt, quality, size, style });
 
+      const { id } = await fileService.uploadImageByUrl(urls[0], {
+        metadata: { prompt, quality, size, style },
+        name: `${prompt}.webp`,
+      });
+
       return {
+        id,
         prompt,
         quality: quality || 'standard',
         size: size || '1024x1024',
         style: style || 'vivid',
-        url: urls[0],
       };
     });
-    console.log(data);
 
     return data;
   },

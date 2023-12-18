@@ -1,4 +1,5 @@
-import { LobeChatPluginApi , Meta } from '@lobehub/chat-plugin-sdk';
+import { LobeChatPluginApi, Meta } from '@lobehub/chat-plugin-sdk';
+import { ReactNode } from 'react';
 
 export interface BuiltinToolManifest {
   api: LobeChatPluginApi[];
@@ -25,3 +26,11 @@ export interface LobeBuiltinTool {
   manifest: BuiltinToolManifest;
   type: 'builtin';
 }
+
+export interface BuiltinRenderProps<Result = any> {
+  content: Result;
+  identifier?: string;
+  messageId: string;
+}
+
+export type BuiltinRender = <T = any>(props: BuiltinRenderProps<T>) => ReactNode;

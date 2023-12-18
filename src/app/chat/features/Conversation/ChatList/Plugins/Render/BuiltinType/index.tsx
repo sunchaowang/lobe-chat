@@ -1,7 +1,10 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
+import { BuiltinToolsRenders } from '@/tools/renders';
+
 import Loading from '../Loading';
+import { useParseContent } from '../useParseContent';
 
 export interface BuiltinTypeProps {
   content: string;
@@ -11,14 +14,7 @@ export interface BuiltinTypeProps {
 }
 
 const BuiltinType = memo<BuiltinTypeProps>(({ content, id, identifier, loading }) => {
-  let isJSON = true;
-  try {
-    JSON.parse(content);
-  } catch {
-    isJSON = false;
-  }
-
-  const contentObj = useMemo<object>(() => (isJSON ? JSON.parse(content) : content), [content]);
+  const { isJSON, data } = useParseContent(content);
 
   if (!isJSON) {
     return (
@@ -29,8 +25,12 @@ const BuiltinType = memo<BuiltinTypeProps>(({ content, id, identifier, loading }
       )
     );
   }
-  console.log(identifier, contentObj);
-  return <div>123</div>;
+
+  const Render = BuiltinToolsRenders[identifier || ''];
+
+  if (!Render) return;
+
+  return <Render content={data} identifier={identifier} messageId={id} />;
 });
 
 export default BuiltinType;

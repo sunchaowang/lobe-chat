@@ -160,24 +160,6 @@ describe('pluginSelectors', () => {
     });
   });
 
-  describe('getPluginManifestLoadingStatus', () => {
-    it('should return "loading" if the plugin manifest is being loaded', () => {
-      const result = pluginSelectors.getPluginManifestLoadingStatus('plugin-2')(mockState);
-      expect(result).toBe('loading');
-    });
-
-    it('should return "error" if the plugin manifest is not found', () => {
-      const result =
-        pluginSelectors.getPluginManifestLoadingStatus('non-existing-plugin')(mockState);
-      expect(result).toBe('error');
-    });
-
-    it('should return "success" if the plugin manifest is loaded', () => {
-      const result = pluginSelectors.getPluginManifestLoadingStatus('plugin-1')(mockState);
-      expect(result).toBe('success');
-    });
-  });
-
   describe('storeAndInstallPluginsIdList', () => {
     it('should return a list of unique plugin identifiers from both installed and store lists', () => {
       const result = pluginSelectors.storeAndInstallPluginsIdList(mockState);

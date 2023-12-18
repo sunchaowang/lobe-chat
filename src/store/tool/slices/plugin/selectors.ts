@@ -33,17 +33,6 @@ const getPluginManifestById = (id: string) => (s: ToolStoreState) =>
 const getPluginSettingsById = (id: string) => (s: ToolStoreState) =>
   getInstalledPluginById(id)(s)?.settings || {};
 
-// 获取插件 manifest 加载状态
-const getPluginManifestLoadingStatus = (id: string) => (s: ToolStoreState) => {
-  const manifest = getPluginManifestById(id)(s);
-
-  if (s.pluginInstallLoading[id]) return 'loading';
-
-  if (!manifest) return 'error';
-
-  if (!!manifest) return 'success';
-};
-
 const storeAndInstallPluginsIdList = (s: ToolStoreState) =>
   uniq(
     [
@@ -79,7 +68,6 @@ export const pluginSelectors = {
   getCustomPluginById,
   getInstalledPluginById,
   getPluginManifestById,
-  getPluginManifestLoadingStatus,
   getPluginMetaById,
   getPluginSettingsById,
   installedCustomPluginMetaList,

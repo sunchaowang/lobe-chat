@@ -1,4 +1,5 @@
 export type ImageGenerationSize = '256x256' | '512x512' | '1024x1024';
+export type DalleImageQuality = 'standard' | 'hd';
 
 export interface OpenAIImagePayload {
   model: 'dall-e-2' | 'dall-e-3';
@@ -16,7 +17,7 @@ export interface OpenAIImagePayload {
    * hd creates images with finer details and greater consistency across the image.
    * This param is only supported for dall-e-3.
    */
-  quality?: 'standard' | 'hd';
+  quality?: DalleImageQuality;
   /**
    * The size of the generated images.
    * Must be one of `256x256`, `512x512`, or `1024x1024`.

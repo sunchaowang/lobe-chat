@@ -1,12 +1,13 @@
 import { Skeleton } from 'antd';
 import dynamic from 'next/dynamic';
-import { Suspense, memo, useMemo } from 'react';
+import { Suspense, memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
 import { useToolStore } from '@/store/tool';
 import { pluginSelectors } from '@/store/tool/selectors';
 
 import Loading from '../Loading';
+import { useParseContent } from '../useParseContent';
 import IFrameRender from './IFrameRender';
 
 const SystemJsRender = dynamic(() => import('./SystemJsRender'), { ssr: false });
@@ -19,14 +20,8 @@ export interface PluginDefaultTypeProps {
 
 const PluginDefaultType = memo<PluginDefaultTypeProps>(({ content, name, loading }) => {
   const manifest = useToolStore(pluginSelectors.getPluginManifestById(name || ''));
-  let isJSON = true;
-  try {
-    JSON.parse(content);
-  } catch {
-    isJSON = false;
-  }
 
-  const contentObj = useMemo<object>(() => (isJSON ? JSON.parse(content) : content), [content]);
+  const { isJSON, data } = useParseContent(content);
 
   if (!isJSON) {
     return (
@@ -47,13 +42,13 @@ const PluginDefaultType = memo<PluginDefaultTypeProps>(({ content, name, loading
   if (ui.mode === 'module')
     return (
       <Suspense fallback={<Skeleton active style={{ width: 400 }} />}>
-        <SystemJsRender content={contentObj} name={name || 'unknown'} url={ui.url} />
+        <SystemJsRender content={data} name={name || 'unknown'} url={ui.url} />
       </Suspense>
     );
 
   return (
     <IFrameRender
-      content={contentObj}
+      content={data}
       height={ui.height}
       name={name || 'unknown'}
       url={ui.url}
