@@ -1,11 +1,11 @@
 export type DallEImageQuality = 'standard' | 'hd';
 export type DallEImageStyle = 'vivid' | 'natural';
-export type DallEImageSize = '256x256' | '512x512' | '1024x1024';
+export type DallEImageSize = '1792x1024' | '1024x1024' | '1024x1792';
 
-export interface DalleImageItem {
-  id: string;
+export interface DallEImageItem {
+  imageId?: string;
   prompt: string;
   quality: DallEImageQuality;
-  size: DallEImageStyle;
-  style: DallEImageSize;
+  size: DallEImageSize;
+  style: DallEImageStyle;
 }

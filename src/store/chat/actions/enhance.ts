@@ -1,13 +1,17 @@
 import { produce } from 'immer';
+import pMap from 'p-map';
 import { StateCreator } from 'zustand/vanilla';
 
 import { chainLangDetect } from '@/chains/langDetect';
 import { chainTranslate } from '@/chains/translate';
 import { supportLocales } from '@/locales/options';
 import { chatService } from '@/services/chat';
+import { fileService } from '@/services/file';
+import { imageGenerationService } from '@/services/imageGeneration';
 import { messageService } from '@/services/message';
 import { chatSelectors } from '@/store/chat/selectors';
 import { ChatStore } from '@/store/chat/store';
+import { DallEImageItem } from '@/types/tool/dalle';
 import { setNamespace } from '@/utils/storeDebug';
 
 const n = setNamespace('enhance');
@@ -17,8 +21,10 @@ const n = setNamespace('enhance');
  */
 export interface ChatEnhanceAction {
   clearTTS: (id: string) => Promise<void>;
-
   clearTranslate: (id: string) => Promise<void>;
+  generateImageFromPrompts: (items: DallEImageItem[], id: string) => Promise<void>;
+
+  toggleDallEImageLoading: (key: string, value: boolean) => void;
   translateMessage: (id: string, targetLang: string) => Promise<void>;
   ttsMessage: (
     id: string,
@@ -40,6 +46,34 @@ export const chatEnhance: StateCreator<
   clearTranslate: async (id) => {
     await messageService.updateMessageTranslate(id, null);
     await get().refreshMessages();
+  },
+
+  generateImageFromPrompts: async (items, messageId) => {
+    const message = chatSelectors.getMessageById(messageId)(get());
+    const parent = chatSelectors.getMessageById(message!.parentId!)(get());
+    const originPrompt = parent?.content;
+
+    await pMap(items, async (params, index) => {
+      get().toggleDallEImageLoading(messageId + params.prompt, true);
+      const urls = await imageGenerationService.generateImage(params);
+      const { id } = await fileService.uploadImageByUrl(urls, {
+        metadata: { ...params, originPrompt: originPrompt },
+        name: `${originPrompt || params.prompt}_${index}.png`,
+      });
+
+      get().toggleDallEImageLoading(messageId + params.prompt, false);
+
+      const nextContent = produce(items, (draft) => {
+        draft[index].imageId = id;
+      });
+
+      await messageService.updateMessageContent(messageId, JSON.stringify(nextContent));
+      await get().refreshMessages();
+    });
+  },
+
+  toggleDallEImageLoading: (key, value) => {
+    set({ dalleImageLoading: { [key]: value } }, false, n('toggleDallEImageLoading'));
   },
 
   translateMessage: async (id, targetLang) => {

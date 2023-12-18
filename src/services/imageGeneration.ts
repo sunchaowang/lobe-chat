@@ -19,7 +19,7 @@ class ImageGenerationService {
 
     const urls = await res.json();
 
-    return urls as string[];
+    return urls[0] as string;
   }
 }
 
