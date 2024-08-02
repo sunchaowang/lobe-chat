@@ -132,7 +132,10 @@ ENV \
     # 01.AI
     ZEROONE_API_KEY="" \
     # Zhipu
-    ZHIPU_API_KEY=""
+    ZHIPU_API_KEY="" \
+
+    CLERK_SECRET_KEY="" \
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="" \
 
 USER nextjs
 
